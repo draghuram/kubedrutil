@@ -3,12 +3,20 @@ services:
   - name: docker:19.03-dind
     command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
 
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_REGISTRY: docker-registry.devad.catalogic.us:5000
+  DOCKER_OPTS: "--insecure-registry='docker-registry.devad.catalogic.us:5000'"
+  DOCKER_DRIVER: overlay2
+
+  DOCKERFILE_NAME_SHORT: kubedrutil
+  DOCKERFILE_NAME_FULL: $DOCKER_REGISTRY/$DOCKERFILE_NAME_SHORT
+
 stages:
   - build
 
 variables:
-  DOCKERFILE_NAME_SHORT: kubedrutil
-  DOCKERFILE_NAME_FULL: $DOCKER_REGISTRY/$DOCKERFILE_NAME_SHORT
 
 before_script:
   - docker info
