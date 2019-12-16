@@ -1,5 +1,4 @@
-image:
-  name: docker:19.03
+image: docker:19.03
   services:
     - name: docker:19.03-dind
       command: ["--insecure-registry=$DOCKER_REGISTRY"]
