@@ -1,0 +1,25 @@
+image:
+  name: docker:19.03
+  services:
+    - name: docker:19.03-dind
+      command: ["--insecure-registry=$DOCKER_REGISTRY"]
+
+stages:
+  - build
+
+variables:
+  DOCKERFILE_NAME_SHORT: kubedrutil
+  DOCKERFILE_NAME_FULL: $DOCKER_REGISTRY/$DOCKERFILE_NAME_SHORT
+
+before_script:
+  - docker info
+  - docker pull $DOCKERFILE_NAME_FULL:latest || true
+
+master:
+  stage: build
+  script:
+    - >
+      docker build
+        --pull
+        --cache-from $DOCKERFILE_NAME_FULL:latest
+        --tag $DOCKERFILE_NAME_FULL:$CI_COMMIT_SHORT_SHA
