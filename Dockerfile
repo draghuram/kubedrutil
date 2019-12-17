@@ -19,8 +19,8 @@ RUN apk update \
  && rm -rf /var/cache/apk/*
 
 # Download etcd
-RUN curl -L https://github.com/etcd-io/etcd/releases/download/v$ETCD_VERSION/etcd-v$ETCD_VERSION-linux-amd64.tar.gz | tar -xzvC ./etcd \
-       && mv etcd/etcdctl /usr/local/bin/etcdctl \
+RUN curl -L https://github.com/etcd-io/etcd/releases/download/v$ETCD_VERSION/etcd-v$ETCD_VERSION-linux-amd64.tar.gz | tar -xzv \
+       && mv etcd*/etcdctl /usr/local/bin/etcdctl \
        && rm -rf ./etcd
 
 # Download restic
