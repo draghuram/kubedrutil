@@ -9,6 +9,7 @@ stages:
     - name: docker:19.03-dind
       command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
   before_script:
+    - apk add --no-cache make
     - docker info
     - cd images
   variables:
