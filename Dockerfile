@@ -8,10 +8,11 @@ RUN apk update \
         fuse \
         openssh \
         jq \
+        musl \
         curl \
         tar \
         bzip2 \
-        etcd-ctl=3.4.3-r2 \
+        etcd=3.4.3-r2 \
         restic=0.9.6-r0 \
  && update-ca-certificates \
  && rm -rf /var/cache/apk/*
