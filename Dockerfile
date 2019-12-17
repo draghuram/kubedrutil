@@ -1,4 +1,4 @@
-FROM alpine:3.8 AS runtime
+FROM alpine:3.10.3 AS runtime
 
 # Install restic runtime dependencies and upgrade existing packages.
 RUN apk update \
@@ -8,12 +8,11 @@ RUN apk update \
         fuse \
         openssh \
         jq \
-        musl \
         curl \
         tar \
         bzip2 \
-        etcd \
-        restic \
+        etcd=3.4.3-r2 \
+        restic=0.9.6-r0 \
  && update-ca-certificates \
  && rm -rf /var/cache/apk/*
 
