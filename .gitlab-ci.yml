@@ -3,6 +3,25 @@ stages:
   - build
   - push
 
+.dnd_template:
+  image: docker:19.03
+  services:
+    - name: docker:19.03-dind
+      command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
+  before_script:
+    - docker info
+    - cd $DOCKER_DIRECTORY
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_REGISTRY: docker-registry.devad.catalogic.us:5000
+    DOCKER_OPTS: "--insecure-registry='docker-registry.devad.catalogic.us:5000'"
+    DOCKER_DRIVER: overlay2
+
+    DOCKER_DIRECTORY: container
+
+    DOCKER_IMAGE_NAME_SHORT: kubedrutil
+    DOCKER_IMAGE_NAME_LONG: $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME_SHORT
 
 yaml_lint:
   stage: lint
@@ -13,23 +32,6 @@ yaml_lint:
     changes:
       - "**/*.yml"
       - "**/*.yaml"
-
-.dnd_template:
-  image: docker:19.03
-  services:
-    - name: docker:19.03-dind
-      command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
-  before_script:
-    - docker info
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    DOCKER_REGISTRY: docker-registry.devad.catalogic.us:5000
-    DOCKER_OPTS: "--insecure-registry='docker-registry.devad.catalogic.us:5000'"
-    DOCKER_DRIVER: overlay2
-
-    DOCKER_IMAGE_NAME_SHORT: kubedrutil
-    DOCKER_IMAGE_NAME_LONG: $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME_SHORT
 
 build_image:
   extends: .dnd_template
@@ -42,6 +44,9 @@ build_image:
       --tag $DOCKER_IMAGE_NAME_LONG:$CI_COMMIT_SHORT_SHA
       .
     - docker push $DOCKER_IMAGE_NAME_LONG:$CI_COMMIT_SHORT_SHA
+  only:
+    changes:
+      - $DOCKER_DIRECTORY/**/*
 
 push_latest:
   extends: .dnd_template
@@ -55,6 +60,8 @@ push_latest:
   only:
     refs:
       - master
+    changes:
+      - containers/**/*
 
 push_tag:
   extends: .dnd_template
@@ -68,3 +75,5 @@ push_tag:
   only:
     refs:
       - tags
+    changes:
+      - $DOCKER_DIRECTORY/**/*
