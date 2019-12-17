@@ -1,8 +1,7 @@
 # kubedrutil
 
-kubedrutil is a 'helper' container used by kubedr for standing up resources / troubleshooting in K8S.
+This project covers both controller configuration and a utility container for the 'kubedr' project.
 
 ## Instructions
 
-To build:
-`
+TBD
