@@ -1,8 +1,18 @@
 stages:
+  - lint
   - build
   - push
 
-variables:
+
+yaml_lint:
+  stage: lint
+  image: sdesbure/yamllint
+  script:
+    - yamllint .
+  only:
+    changes:
+      - "**/*.yml"
+      - "**/*.yaml"
 
 .dnd_template:
   image: docker:19.03
@@ -58,4 +68,3 @@ push_tag:
   only:
     refs:
       - tags
-
