@@ -19,12 +19,12 @@ RUN apk update \
  && rm -rf /var/cache/apk/*
 
 # Download etcd
-RUN curl -L https://github.com/etcd-io/etcd/releases/download/v$ETCD_VERSION/etcd-v$ETCD_VERSION-linux-amd64.tar.gz | tar xzv \
-       && mv etcd*/etcdctl /usr/local/bin/etcdctl \
+RUN curl -L https://github.com/etcd-io/etcd/releases/download/v$ETCD_VERSION/etcd-v$ETCD_VERSION-linux-amd64.tar.gz | tar -xzvC ./etcd \
+       && mv etcd/etcdctl /usr/local/bin/etcdctl \
        && rm -rf ./etcd
 
 # Download restic
-RUN curl -L -o ./restiz.bz2 https://github.com/restic/restic/releases/download/v$RESTIC_VERSION/restic_$RESTIC_VERSION_linux_amd64.bz2 \
+RUN curl -L -o ./restic.bz2 https://github.com/restic/restic/releases/download/v$RESTIC_VERSION/restic_$RESTIC_VERSION_linux_amd64.bz2 \
 	&& bzip2 -dc ./restic.bz2 >> /usr/local/bin/restic \
        && rm -rf ./restic.bz2
 
