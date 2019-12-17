@@ -10,7 +10,7 @@ stages:
       command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
   before_script:
     - docker info
-    - cd container
+    - cd images
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -44,7 +44,7 @@ build_image:
     - docker push $DOCKER_IMAGE_NAME_LONG:$CI_COMMIT_SHORT_SHA
   only:
     changes:
-      - container/**/*
+      - images/**/*
 
 push_latest:
   extends: .dnd_template
@@ -59,7 +59,7 @@ push_latest:
     refs:
       - master
     changes:
-      - container/**/*
+      - images/**/*
 
 push_tag:
   extends: .dnd_template
@@ -74,4 +74,4 @@ push_tag:
     refs:
       - tags
     changes:
-      - container/**/*
+      - images/**/*
