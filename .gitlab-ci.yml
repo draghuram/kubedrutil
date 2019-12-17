@@ -18,8 +18,6 @@ stages:
     DOCKER_OPTS: "--insecure-registry='docker-registry.devad.catalogic.us:5000'"
     DOCKER_DRIVER: overlay2
 
-    DOCKER_DIRECTORY: container
-
     DOCKER_IMAGE_NAME_SHORT: kubedrutil
     DOCKER_IMAGE_NAME_LONG: $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME_SHORT
 
@@ -46,7 +44,7 @@ build_image:
     - docker push $DOCKER_IMAGE_NAME_LONG:$CI_COMMIT_SHORT_SHA
   only:
     changes:
-      - $DOCKER_DIRECTORY/**/*
+      - container/**/*
 
 push_latest:
   extends: .dnd_template
@@ -61,7 +59,7 @@ push_latest:
     refs:
       - master
     changes:
-      - containers/**/*
+      - container/**/*
 
 push_tag:
   extends: .dnd_template
@@ -76,4 +74,4 @@ push_tag:
     refs:
       - tags
     changes:
-      - $DOCKER_DIRECTORY/**/*
+      - container/**/*
