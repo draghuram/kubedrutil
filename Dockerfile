@@ -12,8 +12,8 @@ RUN apk update \
         curl \
         tar \
         bzip2 \
-        etcd=3.4.3-r2 \
-        restic=0.9.6-r0 \
+        etcd \
+        restic \
  && update-ca-certificates \
  && rm -rf /var/cache/apk/*
 
