@@ -10,7 +10,7 @@ stages:
       command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
   before_script:
     - docker info
-    - cd $DOCKER_DIRECTORY
+    - cd container
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
