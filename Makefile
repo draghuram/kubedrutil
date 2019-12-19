@@ -6,10 +6,6 @@ DOCKER_KUBEDRUTIL_IMAGE_TAG ?= latest
 DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT = kubedrutil
 DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG = ${DOCKER_REGISTRY}/${DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT}
 
-# make >= 3.8.2
-# Add special target to have make invoke one instance of shell, regardless of lines
-.ONESHELL:
-
 build: docker_build
 
 docker_build:
