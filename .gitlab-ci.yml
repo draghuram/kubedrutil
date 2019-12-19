@@ -1,23 +1,22 @@
 stages:
-  - lint
-  - build
-  - push
+- lint
+- build
+- push
 
 .lint_template:
   only:
     refs:
-      - master
-      - merge_requests
+    - master
+    - merge_requests
 
 .dnd_template:
   image: docker:19.03
   services:
-    - name: docker:19.03-dind
-      command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
+  - name: docker:19.03-dind
+    command: ["--insecure-registry=docker-registry.devad.catalogic.us:5000"]
   before_script:
-    - apk add --no-cache make
-    - docker info
-    - cd images
+  - apk add --no-cache make
+  - docker info
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -34,16 +33,16 @@ lint_yaml:
   stage: lint
   image: sdesbure/yamllint
   script:
-    - yamllint .
+  - yamllint .
 
 build_image:
   extends: .dnd_template
   stage: build
   script:
-    - make build
+  - make build
   only:
     changes:
-      - images/**/*
+    - images/**/*
 
 push_latest:
   extends: .dnd_template
@@ -54,9 +53,9 @@ push_latest:
     - make docker_push_latest
   only:
     refs:
-      - master
+    - master
     changes:
-      - images/**/*
+    - images/**/*
 
 push_tag:
   extends: .dnd_template
@@ -64,9 +63,9 @@ push_tag:
   variables:
     GIT_STRATEGY: none
   script:
-    - make docker_push_tags
+  - make docker_push_tags
   only:
     refs:
-      - tags
+    - tags
     changes:
-      - images/**/*
+    - images/**/*
