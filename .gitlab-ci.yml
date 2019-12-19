@@ -10,7 +10,7 @@ stages:
     - merge_requests
   except:
     variables:
-    - SKIP_LINT == "yes"
+    - $SKIP_LINT == "yes"
 
 .dnd_template:
   image: docker:19.03
