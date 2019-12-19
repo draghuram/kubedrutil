@@ -3,6 +3,12 @@ stages:
   - build
   - push
 
+.lint_template:
+  only:
+    refs:
+      - master
+      - merge_requests
+
 .dnd_template:
   image: docker:19.03
   services:
