@@ -24,14 +24,11 @@ stages:
     DOCKER_KUBEDRUTIL_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
 
 yaml_lint:
+  extends: .lint_template
   stage: lint
   image: sdesbure/yamllint
   script:
     - yamllint .
-  only:
-    changes:
-      - "**/*.yml"
-      - "**/*.yaml"
 
 build_image:
   extends: .dnd_template
