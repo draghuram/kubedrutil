@@ -43,7 +43,7 @@ build_image:
   stage: build
   script:
   - make build
-  - docker push DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG:$DOCKER_KUBEDRUTIL_IMAGE_TAG
+  - docker push $DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG:$DOCKER_KUBEDRUTIL_IMAGE_TAG
   only:
     changes:
     - images/**/*
