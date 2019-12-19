@@ -50,7 +50,7 @@ push_latest:
   variables:
     GIT_STRATEGY: none
   script:
-    - make docker_push_latest
+  - make docker_push_latest
   only:
     refs:
     - master
