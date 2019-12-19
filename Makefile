@@ -9,12 +9,12 @@ DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG = ${DOCKER_REGISTRY}/${DOCKER_KUBEDRUTIL_IMAGE
 build: docker_build
 
 docker_build:
-	cd ${DOCKER_DIR_BASE}
-	docker pull ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:latest || true
-	docker build \
-		--cache-from ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:latest \
-		--tag ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:${DOCKER_KUBEDRUTIL_IMAGE_TAG} \
-		.
+	cd ${DOCKER_DIR_BASE} && \
+		docker pull ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:latest || true && \
+		docker build \
+			--cache-from ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:latest \
+			--tag ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:${DOCKER_KUBEDRUTIL_IMAGE_TAG} \
+			.
 
 docker_push_latest:
 	docker pull ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:${DOCKER_KUBEDRUTIL_IMAGE_TAG} || true
