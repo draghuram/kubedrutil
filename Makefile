@@ -11,7 +11,7 @@ build: docker_build
 docker_build:
 	cd ${DOCKER_DIR_BASE} && \
 		docker build \
-			--cache-from ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:latest
+			--cache-from ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:latest \
 			--tag ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:${DOCKER_KUBEDRUTIL_IMAGE_TAG} \
 			.
 
