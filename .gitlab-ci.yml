@@ -24,9 +24,10 @@ stages:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    DOCKER_REGISTRY: gitlab.ad.catalogic.us:4567/kubernetes/kubedrutil
     DOCKER_OPTS: "--insecure-registry='docker-registry.devad.catalogic.us:5000'"
     DOCKER_DRIVER: overlay2
+
+    DOCKER_REGISTRY: docker-registry.devad.catalogic.us:5000
 
     DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT: kubedrutil
     DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG: $DOCKER_REGISTRY/$DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT
