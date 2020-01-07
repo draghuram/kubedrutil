@@ -20,6 +20,7 @@ stages:
   before_script:
   - apk add --no-cache make
   - docker info
+  - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -67,10 +68,14 @@ push_tag:
   stage: push
   variables:
     GIT_STRATEGY: none
+
+    DOCKER_REGISTRY: catalogicsoftware
+  before_script:
+  - apk add --no-cache make
+  - docker info
+  - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
   script:
   - make docker_push_tags
   only:
     refs:
     - tags
-    changes:
-    - images/**/*
