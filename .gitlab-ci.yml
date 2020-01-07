@@ -58,6 +58,7 @@ push_latest:
 push_tag:
   extends: .dnd_template
   stage: push
+  variables:
     DOCKER_REGISTRY: catalogicsoftware
   before_script:
   - apk add --no-cache make
