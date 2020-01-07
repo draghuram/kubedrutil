@@ -49,8 +49,6 @@ build_image:
 push_latest:
   extends: .dnd_template
   stage: push
-  variables:
-    GIT_STRATEGY: none
   script:
   - make docker_push_latest
   only:
@@ -60,9 +58,6 @@ push_latest:
 push_tag:
   extends: .dnd_template
   stage: push
-  variables:
-    GIT_STRATEGY: none
-
     DOCKER_REGISTRY: catalogicsoftware
   before_script:
   - apk add --no-cache make
