@@ -46,9 +46,6 @@ build_image:
   script:
   - make build
   - docker push $DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG:$DOCKER_KUBEDRUTIL_IMAGE_TAG
-  only:
-    changes:
-    - images/**/*
 
 push_latest:
   extends: .dnd_template
@@ -60,8 +57,6 @@ push_latest:
   only:
     refs:
     - master
-    changes:
-    - images/**/*
 
 push_tag:
   extends: .dnd_template
