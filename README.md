@@ -1,7 +1,7 @@
-# kubedrutil
+# Kubernetes Cluster Backup Utilities
 
-This project covers both controller configuration and a utility container for the 'kubedr' project.
+## Overview
 
-## Instructions
-
-TBD
+The *kubedrutil* repository contains a helper container for the
+*KubeDR* project. This will also extend to further controller
+configuration in future releases.
