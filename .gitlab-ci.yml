@@ -44,6 +44,7 @@ build_image:
   extends: .dnd_template
   stage: build
   script:
+	- docker pull ${DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG}:${DOCKER_KUBEDRUTIL_IMAGE_TAG} || true
   - make build
   - docker push $DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG:$DOCKER_KUBEDRUTIL_IMAGE_TAG
 
