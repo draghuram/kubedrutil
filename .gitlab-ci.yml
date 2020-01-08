@@ -27,6 +27,7 @@ stages:
     DOCKER_DRIVER: overlay2
 
     DOCKER_REGISTRY: docker-registry.devad.catalogic.us:5000
+    DOCKER_PREFIX: catalogicsoftware.com
 
     DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT: kubedrutil
     DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG: $DOCKER_REGISTRY/$DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT
