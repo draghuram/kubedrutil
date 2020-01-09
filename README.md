@@ -1,7 +1,7 @@
-# Kubernetes Cluster Backup Utilities
 
-## Overview
+# kubedrutil
 
-The *kubedrutil* repository contains a helper container for the
-*KubeDR* project. This will also extend to further controller
-configuration in future releases.
+This project contains core logic to perform etcd and certificate
+backupin a Kubernetes cluster. It is used by
+[KubeDR](https://github.com/catalogicsoftware/kubedr) project.
+
