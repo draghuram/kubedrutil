@@ -26,9 +26,6 @@ stages:
     DOCKER_OPTS: "--insecure-registry='docker-registry.devad.catalogic.us:5000'"
     DOCKER_DRIVER: overlay2
 
-    DOCKER_REGISTRY: docker-registry.devad.catalogic.us:5000
-    DOCKER_PREFIX: catalogicsoftware
-
     DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT: kubedrutil
     DOCKER_KUBEDRUTIL_IMAGE_NAME_LONG: ${DOCKER_REGISTRY}/${DOCKER_KUBEDRUTIL_IMAGE_NAME_SHORT}
     DOCKER_KUBEDRUTIL_IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
