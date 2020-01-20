@@ -11,6 +11,7 @@ RUN apk update \
         curl \
         tar \
         bzip2 \
+        python3 \
  && update-ca-certificates \
  && rm -rf /var/cache/apk/*
 
@@ -30,6 +31,12 @@ RUN curl -L -o /usr/local/bin/kubectl \
     https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
+
 COPY kubedrutil.sh /usr/local/bin
+COPY kubedrutil /opt/kubedrutil
+
+RUN python3 -m venv /opt/venv/kubedrutil \
+     && /opt/venv/kubedrutil/bin/pip install /opt/kubedrutil \
+     && ln -s /opt/venv/kubedrutil/bin/kubedrutil /usr/local/bin/kubedrutil
 
 # ENTRYPOINT ["/usr/local/bin/restic"]
