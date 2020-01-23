@@ -65,12 +65,4 @@ def main():
     logfile = init_logging()
     # logging.critical("logfile: {}".format(logfile))
 
-    try:
-        cli()
-    except Exception as e:
-        logging.error(traceback.format_exc())
-
-        exctype, value = sys.exc_info()[:2]
-        click.secho(traceback.format_exception_only(exctype, value)[0], fg='red')
-
-        sys.exit(1)
+    cli()
