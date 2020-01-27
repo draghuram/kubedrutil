@@ -120,6 +120,12 @@ class MetadataBackupPolicyAPI(KubedrV1AlphaResource):
         self.kind = "MetadataBackupPolicy"
         self.plural = "metadatabackuppolicies"
 
+class MetadataBackupRecordAPI(KubedrV1AlphaResource):
+    def __init__(self, namespace="default"):
+        super().__init__(namespace)
+        self.kind = "MetadataBackupRecord"
+        self.plural = "metadatabackuprecords"
+
 def create_backuploc_creds(name, access_key, secret_key, restic_password):
     creds_data = {
         "access_key": base64.b64encode(access_key.encode("utf-8")).decode("utf-8"),
