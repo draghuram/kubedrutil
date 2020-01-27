@@ -31,8 +31,6 @@ RUN curl -L -o /usr/local/bin/kubectl \
     https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
-
-COPY kubedrutil.sh /usr/local/bin
 COPY kubedrutil /opt/kubedrutil
 
 RUN python3 -m venv /opt/venv/kubedrutil \
