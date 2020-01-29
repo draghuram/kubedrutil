@@ -72,7 +72,6 @@ def restic_backup(config):
                           encoding='utf-8')
     pprint.pprint("    rc = {}".format(resp.returncode))
 
-    # Find snapshot id. Process all the lines.
     snapshot_id = None
     print()
     for line in resp.stdout.splitlines():
@@ -82,14 +81,17 @@ def restic_backup(config):
         if not line:
             continue
 
-        data = json.loads(line)
-        if 'snapshot_id' in data:
-            snapshot_id = data['snapshot_id']
+        try:
+            data = json.loads(line)
+        except json.decoder.JSONDecodeError:
+            # restic may output some lines in plain text so ignore decode errors.
+            print("    Ignoring decode error")
+            continue
+        else:
+            if data["message_type"].lower() == "summary":
+                return data
 
-    if not snapshot_id:
-        raise Exception("Could not find snapshot ID")
-
-    return snapshot_id
+    raise Exception("Could not find summary in restic output")
 
 def create_mbr(policy, snapshot_id):
     mbr_name = "mbr-{}".format(snapshot_id)
@@ -106,8 +108,11 @@ def create_mbr(policy, snapshot_id):
 def backup(config):
     create_etcd_snapshot(config)
     copy_certificates(config)
-    snapshot_id = restic_backup(config)
-    create_mbr(config["KDR_POLICY_NAME"], snapshot_id)
+
+    summary = restic_backup(config)
+    create_mbr(config["KDR_POLICY_NAME"], summary["snapshot_id"])
+
+    return summary
 
 @click.command()
 @context.pass_context
@@ -116,7 +121,35 @@ def cli(ctx):
 
     """
 
+    statusdata = {
+        "backupStatus": "Completed", 
+        "backupErrorMessage": "",
+        "backupTime": time.asctime()
+    }
+
     config = get_config()
-    backup(config)
-    # Process more data from restic response and set status.
-    # Also check for command errors.
+    policy_name = config["KDR_POLICY_NAME"]
+
+    try:
+        summary = backup(config)
+    except Exception as e:
+        pprint.pprint(e)
+        statusdata["backupStatus"] = "Failed"
+        msg = e.message
+        if isinstance(e, subprocess.CalledProcessError):
+            msg += " ({})".format(e.stderr)
+
+        statusdata["backupErrorMessage"] = msg
+    else:
+        statusdata["filesNew"] = summary["files_new"]
+        statusdata["filesChanged"] = summary["files_changed"]
+        statusdata["dataAdded"] = summary["data_added"]
+        statusdata["totalBytesProcessed"] = summary["total_bytes_processed"]
+        statusdata["totalDurationSecs"] = str(summary["total_duration"])
+        statusdata["snapshotId"] = summary["snapshot_id"]
+
+    # Update status
+    mbp_api = kubeclient.MetadataBackupPolicyAPI("kubedr-system")
+    # pprint.pprint(mbp_api.get(policy_name))
+    mbp_api.patch_status(policy_name, {"status": statusdata})
+

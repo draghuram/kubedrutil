@@ -27,25 +27,23 @@ def cli(ctx):
     backuploc_api = kubeclient.BackupLocationAPI("kubedr-system")
     name = os.environ["KDR_BACKUPLOC_NAME"]
 
+    statusdata = {
+        "initStatus": "Completed", 
+        "initErrorMessage": "",
+        "initTime": time.asctime()
+    }
+
     cmd = ["restic", "-r", os.environ["RESTIC_REPO"], "--verbose", "init"]
     print("Running the init command: ({})".format(cmd))
     resp = subprocess.run(cmd, stderr=subprocess.PIPE)
     pprint.pprint(resp)
 
-    statusdata = {
-        "status": {
-            "initStatus": "Completed", 
-            "initErrorMessage": "",
-            "initTime": time.asctime()
-        }
-    }
-
     if resp.returncode != 0:
         # Initialization failed.
         errMsg = resp.stderr.decode("utf-8")
-        statusdata["status"]["initStatus"] = "Failed"
-        statusdata["status"]["initErrorMessage"] = errMsg
-        backuploc_api.patch_status(name, statusdata)
+        statusdata["initStatus"] = "Failed"
+        statusdata["initErrorMessage"] = errMsg
+        backuploc_api.patch_status(name, {"status": statusdata})
 
         raise Exception("Initialization failed, reason: {}".format(errMsg))
 
@@ -53,7 +51,7 @@ def cli(ctx):
     cmd = ["kubectl", "annotate", "backuplocation", name,
            "initialized.annotations.kubedr.catalogicsoftware.com=true"]
     resp = subprocess.run(cmd)
-    backuploc_api.patch_status(name, statusdata)
+    backuploc_api.patch_status(name, {"status": statusdata})
     subprocess.run(["kubectl", "get", "backuplocation", name, "-o", "yaml"])
 
 
