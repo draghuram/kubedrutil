@@ -85,6 +85,13 @@ class SecretAPI(KubeResourceAPI):
         self.v1api.delete_namespaced_secret(name, self.namespace, 
                                             body=client.V1DeleteOptions())
 
+class EventAPI(KubeResourceAPI):
+    def __init__(self, namespace="default"):
+        super().__init__(namespace)
+
+    def create(self, body):
+        return self.v1api.create_namespaced_event(body["metadata"]["namespace"], body)
+
 class PodAPI(KubeResourceAPI):
     def __init__(self, namespace="default"):
         super().__init__(namespace)
