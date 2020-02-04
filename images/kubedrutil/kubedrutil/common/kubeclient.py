@@ -4,6 +4,8 @@ import logging
 import time
 import urllib3
 
+import rfc3339
+
 from kubernetes import client
 from kubernetes import config as k8sconfig
 
@@ -204,6 +206,43 @@ def init():
     k8sconfig.load_incluster_config()
 
     # k8sconfig.load_kube_config()
+
+def format_event_name(involvedObj):
+    return "{}-{}-{}-{}".format(involvedObj["apiVersion"].replace("/", "-"), involvedObj["kind"],
+                                involvedObj["metadata"]["name"],
+                                involvedObj["metadata"]["resourceVersion"])
+
+def generate_event(involvedObj, source_name, reason, message, evtype="Normal"):
+    timestamp = rfc3339.rfc3339(time.time(), utc=True)
+
+    body = {
+        "kind": "Event",
+        "apiVersion": "v1",
+        "count": 1,
+        "firstTimestamp": timestamp,
+        "lastTimestamp": timestamp,
+        "involvedObject": {
+            "apiVersion": involvedObj["apiVersion"],
+            "kind": involvedObj["kind"],
+            "name": involvedObj["metadata"]["name"],
+            "namespace": involvedObj["metadata"]["namespace"],
+            "resourceVersion": involvedObj["metadata"]["resourceVersion"],
+            "uid": involvedObj["metadata"]["uid"]
+        },
+        "message": message,
+        "metadata": {
+            "name": format_event_name(involvedObj),
+            "namespace": involvedObj["metadata"]["namespace"]
+        },
+        "reason": reason,
+        "source": {
+            "component": source_name
+        },
+        "type": evtype
+    }
+
+    event_api = EventAPI("kubedr-system")
+    event_api.create(body)
 
 init()
 

@@ -3,7 +3,9 @@ import os
 import json
 import pprint
 import subprocess
+import sys
 import time
+import traceback
 
 import click
 
@@ -126,30 +128,35 @@ def cli(ctx):
         "backupErrorMessage": "",
         "backupTime": time.asctime()
     }
-
+    mbp_api = kubeclient.MetadataBackupPolicyAPI("kubedr-system")
     config = get_config()
     policy_name = config["KDR_POLICY_NAME"]
+    policy = mbp_api.get(policy_name)
+    pod_name = os.environ["MY_POD_NAME"]
 
     try:
         summary = backup(config)
     except Exception as e:
-        pprint.pprint(e)
         statusdata["backupStatus"] = "Failed"
-        msg = e.message
+        etype, value, tb = sys.exc_info()
+        msg = traceback.format_exception_only(etype, value)[-1].strip()
         if isinstance(e, subprocess.CalledProcessError):
             msg += " ({})".format(e.stderr)
 
         statusdata["backupErrorMessage"] = msg
-    else:
-        statusdata["filesNew"] = summary["files_new"]
-        statusdata["filesChanged"] = summary["files_changed"]
-        statusdata["dataAdded"] = summary["data_added"]
-        statusdata["totalBytesProcessed"] = summary["total_bytes_processed"]
-        statusdata["totalDurationSecs"] = str(summary["total_duration"])
-        statusdata["snapshotId"] = summary["snapshot_id"]
+        mbp_api.patch_status(policy_name, {"status": statusdata})
+        kubeclient.generate_event(policy, pod_name, "BackupFailed", msg, "Error")
+        raise Exception("Backup failed") from e
 
-    # Update status
-    mbp_api = kubeclient.MetadataBackupPolicyAPI("kubedr-system")
-    # pprint.pprint(mbp_api.get(policy_name))
+    statusdata["filesNew"] = summary["files_new"]
+    statusdata["filesChanged"] = summary["files_changed"]
+    statusdata["dataAdded"] = summary["data_added"]
+    statusdata["totalBytesProcessed"] = summary["total_bytes_processed"]
+    statusdata["totalDurationSecs"] = str(summary["total_duration"])
+    statusdata["snapshotId"] = summary["snapshot_id"]
+
     mbp_api.patch_status(policy_name, {"status": statusdata})
+    kubeclient.generate_event(policy, pod_name, "BackupSucceeded",
+                              message="Backup completed, snapshot ID: {}".format(summary["snapshot_id"]))
+
 

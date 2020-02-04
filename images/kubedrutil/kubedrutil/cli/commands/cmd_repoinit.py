@@ -5,7 +5,6 @@ import subprocess
 import time
 
 import click
-import rfc3339
 
 from kubedrutil.cli import context
 from kubedrutil.common import kubeclient
@@ -15,43 +14,6 @@ def validate_env(envlist):
         val = os.environ.get(name, None)
         if not val:
             raise Exception("Env variable {} is not set".format(name))
-
-def format_event_name(involvedObj):
-    return "{}-{}-{}-{}".format(involvedObj["apiVersion"].replace("/", "-"), involvedObj["kind"],
-                                involvedObj["metadata"]["name"],
-                                involvedObj["metadata"]["resourceVersion"])
-
-def generate_event(involvedObj, source_name, reason, message, evtype="Normal"):
-    timestamp = rfc3339.rfc3339(time.time(), utc=True)
-
-    body = {
-        "kind": "Event",
-        "apiVersion": "v1",
-        "count": 1,
-        "firstTimestamp": timestamp,
-        "lastTimestamp": timestamp,
-        "involvedObject": {
-            "apiVersion": involvedObj["apiVersion"],
-            "kind": involvedObj["kind"],
-            "name": involvedObj["metadata"]["name"],
-            "namespace": involvedObj["metadata"]["namespace"],
-            "resourceVersion": involvedObj["metadata"]["resourceVersion"],
-            "uid": involvedObj["metadata"]["uid"]
-        },
-        "message": message,
-        "metadata": {
-            "name": format_event_name(involvedObj),
-            "namespace": involvedObj["metadata"]["namespace"]
-        },
-        "reason": reason,
-        "source": {
-            "component": source_name
-        },
-        "type": evtype
-    }
-
-    event_api = kubeclient.EventAPI("kubedr-system")
-    event_api.create(body)
 
 @click.command()
 @context.pass_context
@@ -84,7 +46,7 @@ def cli(ctx):
         statusdata["initStatus"] = "Failed"
         statusdata["initErrorMessage"] = errMsg
         backuploc_api.patch_status(name, {"status": statusdata})
-        generate_event(backup_loc, pod_name, "InitFailed", errMsg, "Error")
+        kubeclient.generate_event(backup_loc, pod_name, "InitFailed", errMsg, "Error")
 
         raise Exception("Initialization failed, reason: {}".format(errMsg))
 
@@ -94,8 +56,6 @@ def cli(ctx):
     resp = subprocess.run(cmd)
     backuploc_api.patch_status(name, {"status": statusdata})
 
-    generate_event(backup_loc, pod_name, "InitSucceeded",
-                   message="Repo at {} is successfully initialized".format(os.environ["RESTIC_REPO"]))
-
-
+    kubeclient.generate_event(backup_loc, pod_name, "InitSucceeded",
+                              message="Repo at {} is successfully initialized".format(os.environ["RESTIC_REPO"]))
 
