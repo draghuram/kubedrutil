@@ -2,6 +2,7 @@
 import os
 import json
 import pprint
+import shutil
 import subprocess
 import sys
 import time
@@ -56,15 +57,16 @@ def create_etcd_snapshot(config):
 
     pprint.pprint(resp)
 
-def copy_certificates(config):
-    src_dir = config.get('CERTS_SRC_DIR', None)
-    dest_dir = config.get('CERTS_DEST_DIR', None)
+def copy_certificates():
+    src_dir = os.environ.get('CERTS_SRC_DIR', None)
+    dest_dir = os.environ.get('CERTS_DEST_DIR', None)
+    print("certificates copy: src_dir ({}), dest_dir ({})".format(src_dir, dest_dir))
 
     if src_dir and dest_dir:
-        os.makedirs(dest_dir, exist_ok=True)
-        copy_cmd = ["cp", "-R",  '"{}"/*'.format(src_dir), '"{}"'.format(dest_dir)]
-        resp = subprocess.run(copy_cmd, stderr=subprocess.PIPE, check=True, encoding='utf-8', shell=True)
-        pprint.pprint(resp)
+        print("Copying certificates...")
+        shutil.copytree(src_dir, dest_dir)
+    else:
+        print("Not including certificates in the backup")
 
 def restic_backup(config):
     restic_cmd = ["restic", "--json",  "-r",  config['RESTIC_REPO'],
@@ -109,7 +111,7 @@ def create_mbr(policy, snapshot_id):
 
 def backup(config):
     create_etcd_snapshot(config)
-    copy_certificates(config)
+    copy_certificates()
 
     summary = restic_backup(config)
     create_mbr(config["KDR_POLICY_NAME"], summary["snapshot_id"])
@@ -137,6 +139,7 @@ def cli(ctx):
     try:
         summary = backup(config)
     except Exception as e:
+        pprint.pprint(e)
         statusdata["backupStatus"] = "Failed"
         etype, value, tb = sys.exc_info()
         msg = traceback.format_exception_only(etype, value)[-1].strip()
