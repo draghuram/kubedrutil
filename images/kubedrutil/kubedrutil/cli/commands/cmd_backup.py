@@ -87,9 +87,11 @@ def restic_backup(config):
 
         try:
             data = json.loads(line)
-        except json.decoder.JSONDecodeError:
+        except json.decoder.JSONDecodeError as e:
             # restic may output some lines in plain text so ignore decode errors.
-            print("    Ignoring decode error")
+            etype, value, tb = sys.exc_info()
+            msg = traceback.format_exception_only(etype, value)[-1].strip()
+            print("Error while parsing restic output, msg ({}), line ({}), ignoring...".format(msg, line))
             continue
         else:
             if data["message_type"].lower() == "summary":
