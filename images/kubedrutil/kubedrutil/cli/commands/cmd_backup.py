@@ -9,6 +9,7 @@ import time
 import traceback
 
 import click
+import rfc3339
 
 from kubedrutil.cli import context
 from kubedrutil.common import kubeclient
@@ -130,7 +131,7 @@ def cli(ctx):
     statusdata = {
         "backupStatus": "Completed", 
         "backupErrorMessage": "",
-        "backupTime": time.asctime()
+        "backupTime": rfc3339.rfc3339(time.time(), utc=True)
     }
     mbp_api = kubeclient.MetadataBackupPolicyAPI("kubedr-system")
     config = get_config()
@@ -159,6 +160,7 @@ def cli(ctx):
     statusdata["totalBytesProcessed"] = summary["total_bytes_processed"]
     statusdata["totalDurationSecs"] = str(summary["total_duration"])
     statusdata["snapshotId"] = summary["snapshot_id"]
+    statusdata["backupPod"] = pod_name
 
     mbp_api.patch_status(policy_name, {"status": statusdata})
     kubeclient.generate_event(policy, pod_name, "BackupSucceeded",
