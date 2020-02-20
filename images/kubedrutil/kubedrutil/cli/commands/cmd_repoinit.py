@@ -30,6 +30,7 @@ def cli(ctx):
     pod_name = os.environ["MY_POD_NAME"]
 
     statusdata = {
+        "observedGeneration": backup_loc["metadata"]["generation"],
         "initStatus": "Completed", 
         "initErrorMessage": "",
         "initTime": time.asctime()
@@ -54,6 +55,7 @@ def cli(ctx):
     cmd = ["kubectl", "annotate", "backuplocation", name,
            "initialized.annotations.kubedr.catalogicsoftware.com=true"]
     resp = subprocess.run(cmd)
+
     backuploc_api.patch_status(name, {"status": statusdata})
 
     kubeclient.generate_event(backup_loc, pod_name, "InitSucceeded",
