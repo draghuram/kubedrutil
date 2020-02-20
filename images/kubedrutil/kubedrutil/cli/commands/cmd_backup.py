@@ -100,24 +100,26 @@ def restic_backup(config):
 
     raise Exception("Could not find summary in restic output")
 
-def create_mbr(policy, snapshot_id):
+def create_mbr(policy, backuploc_name, snapshot_id):
+    policy_name = policy["metadata"]["name"]
     mbr_name = "mbr-{}".format(snapshot_id)
     print("mbr_name: {}".format(mbr_name))
     mbr_api = kubeclient.MetadataBackupRecordAPI("kubedr-system")
     mbr_spec = {
         "snapshotId": snapshot_id,
-        "policy": policy
+        "policy": policy_name,
+        "backuploc": backuploc_name
     }
     pprint.pprint(mbr_spec)
     print("Creating MBR...")
     mbr_api.create(mbr_name, mbr_spec)
 
-def backup(config):
+def backup(config, policy, backuploc_name):
     create_etcd_snapshot(config)
     copy_certificates()
 
     summary = restic_backup(config)
-    create_mbr(config["KDR_POLICY_NAME"], summary["snapshot_id"])
+    create_mbr(policy, backuploc_name, summary["snapshot_id"])
 
     return summary
 
@@ -137,10 +139,11 @@ def cli(ctx):
     config = get_config()
     policy_name = config["KDR_POLICY_NAME"]
     policy = mbp_api.get(policy_name)
+    backuploc_name = policy["spec"]["destination"]
     pod_name = os.environ["MY_POD_NAME"]
 
     try:
-        summary = backup(config)
+        summary = backup(config, policy, backuploc_name)
     except Exception as e:
         pprint.pprint(e)
         statusdata["backupStatus"] = "Failed"
