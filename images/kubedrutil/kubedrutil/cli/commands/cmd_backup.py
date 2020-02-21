@@ -114,14 +114,16 @@ def create_mbr(policy, backuploc_name, snapshot_id):
     print("Creating MBR...")
     mbr_api.create(mbr_name, mbr_spec)
 
+    return mbr_name
+
 def backup(config, policy, backuploc_name):
     create_etcd_snapshot(config)
     copy_certificates()
 
     summary = restic_backup(config)
-    create_mbr(policy, backuploc_name, summary["snapshot_id"])
+    mbr_name = create_mbr(policy, backuploc_name, summary["snapshot_id"])
 
-    return summary
+    return summary, mbr_name
 
 @click.command()
 @context.pass_context
@@ -133,7 +135,8 @@ def cli(ctx):
     statusdata = {
         "backupStatus": "Completed", 
         "backupErrorMessage": "",
-        "backupTime": rfc3339.rfc3339(time.time(), utc=True)
+        "backupTime": rfc3339.rfc3339(time.time(), utc=True),
+        "mbrName": ""
     }
     mbp_api = kubeclient.MetadataBackupPolicyAPI("kubedr-system")
     config = get_config()
@@ -143,7 +146,7 @@ def cli(ctx):
     pod_name = os.environ["MY_POD_NAME"]
 
     try:
-        summary = backup(config, policy, backuploc_name)
+        summary, mbr_name = backup(config, policy, backuploc_name)
     except Exception as e:
         pprint.pprint(e)
         statusdata["backupStatus"] = "Failed"
@@ -164,6 +167,7 @@ def cli(ctx):
     statusdata["totalDurationSecs"] = str(summary["total_duration"])
     statusdata["snapshotId"] = summary["snapshot_id"]
     statusdata["backupPod"] = pod_name
+    statusdata["mbrName"] = mbr_name
 
     mbp_api.patch_status(policy_name, {"status": statusdata})
     kubeclient.generate_event(policy, pod_name, "BackupSucceeded",

@@ -129,6 +129,12 @@ class MetadataBackupPolicyAPI(KubedrV1AlphaResource):
         self.kind = "MetadataBackupPolicy"
         self.plural = "metadatabackuppolicies"
 
+class MetadataRestoreAPI(KubedrV1AlphaResource):
+    def __init__(self, namespace="default"):
+        super().__init__(namespace)
+        self.kind = "MetadataRestore"
+        self.plural = "metadatarestores"
+
 class MetadataBackupRecordAPI(KubedrV1AlphaResource):
     def __init__(self, namespace="default"):
         super().__init__(namespace)
